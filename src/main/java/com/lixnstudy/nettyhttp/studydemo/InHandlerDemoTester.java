@@ -1,28 +1,19 @@
-package com.lixinstudy.nettyhttp;
+package com.lixnstudy.nettyhttp.studydemo;
 
-import com.lixnstudy.nettyhttp.studydemo.InHandlerDemo;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
+import io.netty.channel.Channel;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.embedded.EmbeddedChannel;
-import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.SpringBootTest;
 
 /**
  * @Author lixn
- * @ClassName NettyHttpApplication
- * @CreateDate 2021/9/7
+ * @ClassName InHandlerDemoTester
+ * @CreateDate 2021/9/8
  * @Description
  */
-@SpringBootTest
-public class NettyHttpApplicationTests {
+public class InHandlerDemoTester {
 
-    @Test
-    void contextLoads() {
-
-    }
-
-    @Test
     public void testInHandlerLifeCircle() {
         final InHandlerDemo handler = new InHandlerDemo();
         // 初始化处理器
@@ -51,4 +42,27 @@ public class NettyHttpApplicationTests {
         }
     }
 
+    public void testLifeCircle() {
+        final InHandlerDemo inHandler = new InHandlerDemo();
+        ChannelInitializer i = new ChannelInitializer<EmbeddedChannel>() {
+            @Override
+            protected void initChannel(EmbeddedChannel ch) {
+                ch.pipeline().addLast(inHandler);
+            }
+        };
+        EmbeddedChannel channel = new EmbeddedChannel(i);
+        ByteBuf buf = Unpooled.buffer();
+        buf.writeInt(1);
+        channel.writeInbound(buf);
+        channel.flush();
+        buf.writeInt(1);
+        channel.writeInbound(buf);
+        channel.flush();
+        channel.close();
+        try {
+            Thread.sleep(Integer.MAX_VALUE);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
 }

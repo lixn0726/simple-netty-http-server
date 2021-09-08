@@ -64,8 +64,13 @@ public class NettyDiscardServer {
             为什么不需要装配父通道的流水线？
                 因为父通道的内部业务处理是固定的：
                 接收新连接 -> 创建子通道 -> 初始化子通道
+            如果真的需要自定义，可以使用
+            b.handler(ChannelHandler handler);
              */
             b.childHandler(new ChannelInitializer<SocketChannel>() {
+                // ChannelInitializer::initChannel(Channel channel)
+                // 接收一个Channel通道，拿到这个通道的流水线Pipeline，往里面装配Handler
+                // ------------------------------ //
                 // 有连接到达时会创建一个通道
                 protected void initChannel(SocketChannel ch) throws Exception {
                     // 流水线管理字通道中的Handler处理器
@@ -75,6 +80,14 @@ public class NettyDiscardServer {
             });
             // 6 开始绑定服务器
             // 通过调用sync同步方法阻塞直到绑定成功
+            /*
+            在Netty中，所有IO操作都是异步执行的，那么任何一个IO操作都会立刻返回，在返回的时候，任务还没有真正的执行
+            那么什么时候执行完成呢？
+            Netty的异步IO都会返回ChanelFuture，
+                1、通过自我阻塞一直到ChannelFuture异步我任务执行完成，
+                2、或者为ChannelFuture增加事件监听器
+            两种方式，使用了第一种
+             */
             ChannelFuture channelFuture = b.bind().sync();
             LOGGER.info("服务器启动成功，监听端口" +
                     channelFuture.channel().localAddress());

@@ -5,44 +5,32 @@ import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.embedded.EmbeddedChannel;
-import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.SpringBootTest;
 
 /**
  * @Author lixn
- * @ClassName NettyHttpApplication
- * @CreateDate 2021/9/7
+ * @ClassName Test
+ * @CreateDate 2021/9/8
  * @Description
  */
-@SpringBootTest
-public class NettyHttpApplicationTests {
-
-    @Test
-    void contextLoads() {
-
-    }
-
-    @Test
-    public void testInHandlerLifeCircle() {
-        final InHandlerDemo handler = new InHandlerDemo();
-        // 初始化处理器
+public class Test {
+    @org.junit.jupiter.api.Test
+    public void testLifeCircle() {
+        final InHandlerDemo inHandler = new InHandlerDemo();
         ChannelInitializer i = new ChannelInitializer<EmbeddedChannel>() {
             @Override
-            protected void initChannel(EmbeddedChannel embeddedChannel) throws Exception {
-                embeddedChannel.pipeline().addLast(handler);
+            protected void initChannel(EmbeddedChannel ch) {
+                ch.pipeline().addLast(inHandler);// todo handlerAdded
             }
         };
-        // 创建嵌入式通道
-        EmbeddedChannel channel = new EmbeddedChannel();
+        EmbeddedChannel channel = new EmbeddedChannel(i);// 通道被创建 -> channelRegistered?
+        // 在创建通道的时候，new进去一个ChannelInitializer，在Initializer中，往流水线中增加了一个Handler
         ByteBuf buf = Unpooled.buffer();
         buf.writeInt(1);
-        // 模拟入站，写入一个入站数据包
         channel.writeInbound(buf);
         channel.flush();
-        // 模拟入站，再写入一个数据报
+        buf.writeInt(1);
         channel.writeInbound(buf);
         channel.flush();
-        // 通道关闭
         channel.close();
         try {
             Thread.sleep(Integer.MAX_VALUE);
