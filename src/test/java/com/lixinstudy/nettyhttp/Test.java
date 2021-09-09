@@ -1,5 +1,6 @@
 package com.lixinstudy.nettyhttp;
 
+import com.lixnstudy.nettyhttp.decoder.string.replay.RandomUtil;
 import com.lixnstudy.nettyhttp.studydemo.InHandlerDemo;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
@@ -37,6 +38,11 @@ public class Test {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
+    }
+
+    @org.junit.jupiter.api.Test
+    public void test() {
+        System.out.println(RandomUtil.randInMod(3));
     }
 
 }
