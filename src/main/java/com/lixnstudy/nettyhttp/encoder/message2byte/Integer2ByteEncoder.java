@@ -1,4 +1,4 @@
-package com.lixnstudy.nettyhttp.encoder;
+package com.lixnstudy.nettyhttp.encoder.message2byte;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
