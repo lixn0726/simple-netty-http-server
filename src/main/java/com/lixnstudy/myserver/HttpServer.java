@@ -64,12 +64,17 @@ public class HttpServer {
         @Override
         protected void initChannel(Channel channel) throws Exception {
             ByteBuf delimiter = Unpooled.copiedBuffer("$_".getBytes(StandardCharsets.UTF_8));
-            channel.pipeline().addLast(new DelimiterBasedFrameDecoder(1024, delimiter));
-            channel.pipeline().addLast(new StringDecoder());
+            channel.pipeline().addLast(new DelimiterBasedFrameDecoder(1024, delimiter));// 防止半包问题
+            channel.pipeline().addLast(new StringDecoder());// ByteBuf -> String
             channel.pipeline().addLast(new EchoServerHandler());
         }
     }
 
+
+    public static void main(String[] args) {
+        int port = 8080;
+        new HttpServer(port).runServer();
+    }
 
 
 }
