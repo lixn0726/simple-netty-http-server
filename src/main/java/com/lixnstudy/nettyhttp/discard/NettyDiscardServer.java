@@ -2,13 +2,12 @@ package com.lixnstudy.nettyhttp.discard;
 
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.buffer.PooledByteBufAllocator;
-import io.netty.channel.ChannelFuture;
-import io.netty.channel.ChannelInitializer;
-import io.netty.channel.ChannelOption;
-import io.netty.channel.EventLoopGroup;
+import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
+import io.netty.handler.codec.DecoderResultProvider;
+import io.netty.handler.codec.http.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -75,7 +74,12 @@ public class NettyDiscardServer {
                 protected void initChannel(SocketChannel ch) throws Exception {
                     // 流水线管理字通道中的Handler处理器
                     // 向子通道流水线添加一个Handler处理器
-                    ch.pipeline().addLast(new NettyDiscardHandler());
+                    ChannelPipeline pipeline = ch.pipeline();
+//                    ch.pipeline().addLast(new NettyDiscardHandler());
+
+                    pipeline.addLast(new HttpRequestDecoder());
+                    pipeline.addLast(new HttpObjectAggregator(1024));
+                    pipeline.addLast(new NettyDiscardHandler());
                 }
             });
             // 6 开始绑定服务器

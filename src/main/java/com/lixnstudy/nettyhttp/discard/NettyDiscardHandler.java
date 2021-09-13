@@ -24,13 +24,25 @@ public class NettyDiscardHandler extends ChannelInboundHandlerAdapter {
     private static final Logger LOGGER = LoggerFactory.getLogger(NettyDiscardHandler.class);
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {// 读取了Netty的输入数据缓冲区ByteBuf，其实可以跟NIO的缓冲区对应，不过Netty的性能会更好
+        // msg是从底层操作系统的内核缓冲区复制到ByteBuf的？
         ByteBuf in = (ByteBuf) msg;
         try {
-            LOGGER.info("收到消息，丢弃如下");
+            StringBuilder stringBuilder = new StringBuilder();
+            LOGGER.info("收到消息如下");
             while (in.isReadable()) {
-                System.out.println((char) in.readByte());
+                char c = (char) in.readByte();
+                stringBuilder.append((char) in.readByte());
             }
+            String str = stringBuilder.toString();
+            String[] request = str.split("\r\n");
+            System.out.println("request size is " + request.length);
+//            for (String part : request) {
+//                System.out.println(part);
+//            }
+            System.out.println(request[request.length - 1]);
+//            System.out.println(stringBuilder.toString());
             System.out.println();
+
         } finally {
             ReferenceCountUtil.release(msg);
         }
