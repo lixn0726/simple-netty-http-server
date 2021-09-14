@@ -31,7 +31,8 @@ public class HttpServerHandler extends ChannelInboundHandlerAdapter {
 
         response.headers().set(HttpHeaderNames.CONTENT_TYPE, "text/plain; charset=UTF-8");
         response.headers().set(HttpHeaderNames.CONTENT_LENGTH, response.content().readableBytes());
-        response.headers().set(HttpHeaderNames.CONNECTION, HttpHeaderValues.KEEP_ALIVE);
+//        response.headers().set(HttpHeaderNames.CONNECTION, HttpHeaderValues.KEEP_ALIVE);
+        System.out.println("我是end ： " + System.currentTimeMillis());
         ctx.writeAndFlush(response);
     }
 }
